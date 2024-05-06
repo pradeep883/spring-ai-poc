@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import poc.pt.model.GeneratedImage;
 
-@Service
+@Service 
 public class AIService {
 	
 	private static String prompt = 	"WRITE A MESMERIZING POEM ON cat";
