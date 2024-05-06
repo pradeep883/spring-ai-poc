@@ -22,7 +22,10 @@ import poc.pt.model.GeneratedImage;
 @Service 
 public class AIService {
 	
-	private static String prompt = 	"WRITE A MESMERIZING POEM ON cat";
+	private static String prompt_placeholder = 	"WRITE A MESMERIZING POEM ON %s";
+	private static String JOKE = "CAN YOU PLEASE CRAFT A JOKE FOR ME? YOU CAN CAFT ON {topic}, BUT IT SHOULD INCLUDE A OLD MEN";
+	private static String FIND_A_MOVIE = "HELLO AI CAN YOU PLEASE HELP ME IN FINDING A MOVIE OF BOLLYWOOD FOR THIS SATURDAY NIGHT? AS YOU KNOW I AM MOVIE LOVER BUT I LIKE ONLY {category} MOVIES GENERALLY DO NOT MIND OLD MOVIES BUT PREFERT TO SEE MOVIES OF YEAR {year}. BETTER IF YOU CAN GIVE ME SUMMERY ALSO ALONG WITH ITS NAME. PLEASE PROVIDE ME THESE DETAILS IN JSON FORMAT LIKE THIS JSON format: category, year, movieName, director, review, smallSummary. ";	
+	private static String CREATE_A_SATISFYING_IMAGE_2 = "I AM REALLY BOARD FROM ONLINE MEMES. CAN YOU CREATE ME A PROMPT ABOUT {topic}. ELEVATE THE GIVEN TOPIC. MAKE IT CLASSY. MAKE A RESOLUTION OF 256X256, BUT ENSURE THAT IT IS PRESENTED IN JSON IT NEED TO BE STRING. I DESIRE ONLY ONE CREATION. GIVE ME AS JSON FORMAT: prompt, n, size.";
 	
 	@Autowired
 	AiClient aiClient;
@@ -34,38 +37,22 @@ public class AIService {
 	private String aiApiKey;
 	
 	public String createMeme(String subject) {
+		
+		String prompt = String.format(prompt_placeholder, subject);
 		return aiClient.generate(prompt);
 	}
 	
 	
     public String getJoke(String topic){
-        PromptTemplate promptTemplate = new PromptTemplate("""
-                Crafting a compilation of programming jokes for my website. Would you like me to create a joke about {topic}?
-                """);
+    	
+        PromptTemplate promptTemplate = new PromptTemplate(JOKE);
         promptTemplate.add("topic", topic);
         return this.aiClient.generate(promptTemplate.create()).getGeneration().getText();
     }
     
-    public String getBestBook(String category, String year) {
-        PromptTemplate promptTemplate = new PromptTemplate("""
-                I want to research some books. How about you give me a book about {category} in {year} to get started?
-                But pick the best best you can think of. I'm a book critic, after all. Ratings are a good place to start.
-                And who wrote it? And who help it? Can you give me a short plot summary and also it's name?
-                But don't give me too much information. I want to be surprised.
-                And please give me these details in the following JSON format: category, year, bookName, author, review, smallSummary.
-                """);
-        Map.of("category", category, "year", year).forEach(promptTemplate::add);
-        AiResponse generate = this.aiClient.generate(promptTemplate.create());
-        return generate.getGeneration().getText();
-    }
     
     public InputStreamResource getImage(@RequestParam(name = "topic") String topic) throws URISyntaxException {
-        PromptTemplate promptTemplate = new PromptTemplate("""
-                 I am really board from online memes. Can you create me a prompt about {topic}.
-                 Elevate the given topic. Make it classy.
-                 Make a resolution of 256x256, but ensure that it is presented in json it need to be string.
-                 I desire only one creation. Give me as JSON format: prompt, n, size.
-                """);
+        PromptTemplate promptTemplate = new PromptTemplate(CREATE_A_SATISFYING_IMAGE_2);
         promptTemplate.add("topic", topic);
         String imagePrompt = this.aiClient.generate(promptTemplate.create()).getGeneration().getText();
 
@@ -80,6 +67,13 @@ public class AIService {
         byte[] imageBytes = restTemplate.getForObject(new URI(imageUrl), byte[].class);
         assert imageBytes != null;
         return new InputStreamResource(new java.io.ByteArrayInputStream(imageBytes));
+    }
+    
+    public String findANovel(String category, String year) {
+        PromptTemplate promptTemplate = new PromptTemplate(FIND_A_MOVIE);
+        Map.of("category", category, "year", year).forEach(promptTemplate::add);
+        AiResponse generate = this.aiClient.generate(promptTemplate.create());
+        return generate.getGeneration().getText();
     }
 	
 }

@@ -29,9 +29,9 @@ public class PromptController {
         return aiService.getJoke(topic);
     }
 
-    @GetMapping("/book")
+    @GetMapping("/movie")
     public String getBook(@RequestParam(name = "category") String category, @RequestParam(name = "year") String year) {
-        return aiService.getBestBook(category, year);
+        return aiService.findANovel(category, year);
     }
 
     @GetMapping(value = "/image", produces = "image/jpeg")
