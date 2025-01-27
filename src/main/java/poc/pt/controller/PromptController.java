@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import lombok.extern.slf4j.Slf4j;
 import poc.pt.service.AIService;
 
 @RestController
 @RequestMapping("ai")
+@Slf4j
 public class PromptController {
 	
 	private @Autowired
@@ -21,6 +22,7 @@ public class PromptController {
 	
 	@GetMapping("/createMeme")
 	public ResponseEntity<String> getMethodName(@RequestParam String subject) {
+	  log.info("request received");
 		return ResponseEntity.ok(aiService.createMeme(subject));
 	}
 	
